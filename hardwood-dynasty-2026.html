@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hardwood Dynasty — 2026 Offseason & Longevity Simulation</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f141c;--p:#18202b;--ink:#e8edf5;--mu:#98a3b3;--ln:#2b3644;--hd:#1d3f7a;--lk:#8ab4ff;--ac:#f0b429;--up:#5fd28a;--dn:#ff8a7a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#eceff3;--p:#fff;--ink:#16191f;--mu:#5d6673;--ln:#d5d9e0;--hd:#12264a;--lk:#1d4ed8;--ac:#f0b429;--up:#1b7a3d;--dn:#c0392b}}
+:root[data-theme="light"]{--bg:#eceff3;--p:#fff;--ink:#16191f;--mu:#5d6673;--ln:#d5d9e0;--hd:#12264a;--lk:#1d4ed8;--ac:#f0b429;--up:#1b7a3d;--dn:#c0392b}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:16px}
+header{background:var(--hd);color:#fff;border-radius:12px;padding:20px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between;box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+.header-top{display:flex;justify-content:space-between;align-items:center;width:100%}
+h1{margin:0;font:700 34px/1 Oswald,Impact,sans-serif;letter-spacing:0.5px}
+.theme-btn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:6px 12px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px}
+.theme-btn:hover{background:rgba(255,255,255,0.25)}
+.st{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;opacity:.95}.st b{display:block;font-size:18px}
+nav{display:flex;gap:4px;margin:16px 0;border-bottom:2px solid var(--ln);overflow-x:auto}
+nav button{background:none;border:0;padding:10px 14px;font:inherit;font-weight:600;color:var(--mu);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+nav button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--ac)}
+section{background:var(--p);border:1px solid var(--ln);border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:520px}
+th,td{padding:9px 8px;text-align:left;border-bottom:1px solid var(--ln);white-space:nowrap}th{font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:0.5px}
+.btn{background:var(--hd);color:#fff;border:0;border-radius:8px;padding:9px 14px;font:inherit;font-weight:600;cursor:pointer;margin:0 6px 8px 0;transition:transform 0.1s}
+.btn:active{transform:scale(0.98)}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--ln)}.btn.go{background:var(--ac);color:#1a1300;padding:12px 20px;font-weight:700}
+.lnk{background:none;border:0;padding:0;font:inherit;color:var(--lk);text-decoration:underline;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+input,select{font:inherit;padding:10px;border:1px solid var(--ln);border-radius:8px;background:var(--bg);color:var(--ink)}
+.mu{color:var(--mu);margin:0 0 12px}.up{color:var(--up);font-weight:600}.dn{color:var(--dn);font-weight:600}
+.empty{color:var(--mu);padding:24px 0;text-align:center}h3{margin:14px 0 8px;font:700 20px Oswald,sans-serif}
+ul{list-style:none;margin:0;padding:0}li{padding:6px 0;border-bottom:1px solid var(--ln)}
+.badge{display:inline-block;font-size:10px;background:var(--ac);color:#1a1300;padding:2px 7px;border-radius:10px;margin-left:6px;font-weight:700;vertical-align:middle}
+.action-bar{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:16px;align-items:center}
+</style>
+</head>
+<body>
+<main>
+<header>
+ <div class="header-top">
+   <div><h1>Hardwood Dynasty (2026 Offseason)</h1><div style="opacity:.9;font-size:14px">2026 offseason stars · 15-man rosters · slower regression · retirements at 38+</div></div>
+   <button class="theme-btn" id="themeToggle">🌓 Theme</button>
+ </div>
+ <div class="st"><div>Season<b id="a"></b></div><div>Players<b id="b"></b></div><div>Last champion<b id="c"></b></div><div>Hall of Fame<b id="d"></b></div></div>
+</header>
+<nav id="nav"></nav>
+<section id="view"></section>
+<div class="action-bar">
+  <button class="btn go" data-a="play" id="play"></button>
+  <button class="btn alt" id="reset">Reset league</button>
+</div>
+</main>
+<script>
+(function(){
+var ROSTER_2026 = [
+  {"forename":"Shai","surname":"Gilgeous-Alexander","age":28,"position":"PG","teamID":"OKC","rating":97,"potential":98},
+  {"forename":"Victor","surname":"Wembanyama","age":22,"position":"C","teamID":"SAS","rating":97,"potential":99},
+  {"forename":"Nikola","surname":"Jokic","age":31,"position":"C","teamID":"DEN","rating":97,"potential":97},
+  {"forename":"Luka","surname":"Doncic","age":27,"position":"PG","teamID":"LAL","rating":96,"potential":97},
+  {"forename":"Jalen","surname":"Brunson","age":30,"position":"PG","teamID":"NYK","rating":96,"potential":96},
+  {"forename":"Giannis","surname":"Antetokounmpo","age":31,"position":"PF","teamID":"MIA","rating":96,"potential":96},
+  {"forename":"Anthony","surname":"Edwards","age":25,"position":"SG","teamID":"MIN","rating":95,"potential":98},
+  {"forename":"Cade","surname":"Cunningham","age":25,"position":"PG","teamID":"DET","rating":94,"potential":97},
+  {"forename":"Stephen","surname":"Curry","age":38,"position":"PG","teamID":"GSW","rating":93,"potential":93},
+  {"forename":"Kevin","surname":"Durant","age":38,"position":"SF","teamID":"HOU","rating":93,"potential":93},
+  {"forename":"Kawhi","surname":"Leonard","age":35,"position":"SF","teamID":"TOR","rating":93,"potential":93},
+  {"forename":"Jayson","surname":"Tatum","age":28,"position":"SF","teamID":"BOS","rating":93,"potential":94},
+  {"forename":"Donovan","surname":"Mitchell","age":30,"position":"SG","teamID":"CLE","rating":93,"potential":93},
+  {"forename":"Karl-Anthony","surname":"Towns","age":31,"position":"C","teamID":"NYK","rating":93,"potential":93},
+  {"forename":"Tyrese","surname":"Maxey","age":26,"position":"PG","teamID":"PHI","rating":92,"potential":94},
+  {"forename":"LeBron","surname":"James","age":41,"position":"SF","teamID":"PHI","rating":91,"potential":91},
+  {"forename":"Jaylen","surname":"Brown","age":30,"position":"SG","teamID":"PHI","rating":91,"potential":91},
+  {"forename":"Joel","surname":"Embiid","age":32,"position":"C","teamID":"PHI","rating":91,"potential":91},
+  {"forename":"Devin","surname":"Booker","age":30,"position":"SG","teamID":"PHX","rating":91,"potential":91},
+  {"forename":"Tyrese","surname":"Haliburton","age":26,"position":"PG","teamID":"IND","rating":90,"potential":93},
+  {"forename":"Anthony","surname":"Davis","age":33,"position":"PF","teamID":"WAS","rating":90,"potential":90},
+  {"forename":"Jamal","surname":"Murray","age":29,"position":"PG","teamID":"DEN","rating":89,"potential":90},
+  {"forename":"Scottie","surname":"Barnes","age":25,"position":"SF","teamID":"TOR","rating":88,"potential":92},
+  {"forename":"OG","surname":"Anunoby","age":29,"position":"SF","teamID":"NYK","rating":88,"potential":88},
+  {"forename":"Deni","surname":"Avdija","age":25,"position":"SF","teamID":"POR","rating":88,"potential":91},
+  {"forename":"Austin","surname":"Reaves","age":28,"position":"SG","teamID":"LAL","rating":88,"potential":89},
+  {"forename":"Paolo","surname":"Banchero","age":24,"position":"PF","teamID":"ORL","rating":87,"potential":93},
+  {"forename":"Jalen","surname":"Johnson","age":25,"position":"SF","teamID":"ATL","rating":87,"potential":91},
+  {"forename":"Bam","surname":"Adebayo","age":29,"position":"C","teamID":"MIA","rating":87,"potential":88},
+  {"forename":"Pascal","surname":"Siakam","age":32,"position":"PF","teamID":"IND","rating":87,"potential":87},
+  {"forename":"James","surname":"Harden","age":37,"position":"PG","teamID":"CLE","rating":87,"potential":87},
+  {"forename":"Evan","surname":"Mobley","age":25,"position":"PF","teamID":"CLE","rating":87,"potential":92},
+  {"forename":"Alperen","surname":"Sengun","age":24,"position":"C","teamID":"HOU","rating":87,"potential":92},
+  {"forename":"Stephon","surname":"Castle","age":22,"position":"SG","teamID":"SAS","rating":87,"potential":94},
+  {"forename":"Trae","surname":"Young","age":28,"position":"PG","teamID":"WAS","rating":87,"potential":88},
+  {"forename":"Kyrie","surname":"Irving","age":34,"position":"PG","teamID":"DAL","rating":87,"potential":87},
+  {"forename":"Cooper","surname":"Flagg","age":20,"position":"SF","teamID":"DAL","rating":87,"potential":98},
+  {"forename":"Lauri","surname":"Markkanen","age":29,"position":"PF","teamID":"UTA","rating":86,"potential":87},
+  {"forename":"LaMelo","surname":"Ball","age":25,"position":"PG","teamID":"MIN","rating":86,"potential":91},
+  {"forename":"Jaren","surname":"Jackson Jr.","age":27,"position":"PF","teamID":"UTA","rating":86,"potential":88},
+  {"forename":"Amen","surname":"Thompson","age":23,"position":"SG","teamID":"HOU","rating":86,"potential":93},
+  {"forename":"Chet","surname":"Holmgren","age":24,"position":"C","teamID":"OKC","rating":86,"potential":92},
+  {"forename":"Damian","surname":"Lillard","age":36,"position":"PG","teamID":"POR","rating":86,"potential":86},
+  {"forename":"Jalen","surname":"Duren","age":23,"position":"C","teamID":"DET","rating":85,"potential":92},
+  {"forename":"Jalen","surname":"Williams","age":25,"position":"SF","teamID":"OKC","rating":85,"potential":90},
+  {"forename":"Jimmy","surname":"Butler","age":37,"position":"SF","teamID":"GSW","rating":85,"potential":85},
+  {"forename":"Trey","surname":"Murphy III","age":26,"position":"SF","teamID":"NOP","rating":85,"potential":88},
+  {"forename":"Franz","surname":"Wagner","age":25,"position":"SF","teamID":"ORL","rating":85,"potential":90},
+  {"forename":"Michael","surname":"Porter Jr.","age":28,"position":"SF","teamID":"BKN","rating":85,"potential":85},
+  {"forename":"Zion","surname":"Williamson","age":26,"position":"PF","teamID":"NOP","rating":85,"potential":89},
+  {"forename":"Dylan","surname":"Harper","age":21,"position":"PG","teamID":"SAS","rating":85,"potential":94},
+  {"forename":"Jaden","surname":"McDaniels","age":26,"position":"SF","teamID":"MIN","rating":85,"potential":88},
+  {"forename":"Ausar","surname":"Thompson","age":23,"position":"SF","teamID":"DET","rating":85,"potential":91},
+  {"forename":"Tyler","surname":"Herro","age":27,"position":"SG","teamID":"MIL","rating":85,"potential":87},
+  {"forename":"Domantas","surname":"Sabonis","age":30,"position":"C","teamID":"SAC","rating":85,"potential":85},
+  {"forename":"Jarrett","surname":"Allen","age":28,"position":"C","teamID":"CLE","rating":85,"potential":86},
+  {"forename":"Brandon","surname":"Miller","age":24,"position":"SF","teamID":"CHA","rating":85,"potential":91},
+  {"forename":"De'Aaron","surname":"Fox","age":29,"position":"PG","teamID":"SAS","rating":84,"potential":85},
+  {"forename":"Rudy","surname":"Gobert","age":34,"position":"C","teamID":"MIN","rating":84,"potential":84},
+  {"forename":"Ja","surname":"Morant","age":27,"position":"PG","teamID":"POR","rating":84,"potential":88},
+  {"forename":"Brandon","surname":"Ingram","age":29,"position":"SF","teamID":"LAC","rating":84,"potential":85},
+  {"forename":"Josh","surname":"Giddey","age":24,"position":"PG","teamID":"CHI","rating":84,"potential":89},
+  {"forename":"Norman","surname":"Powell","age":33,"position":"SG","teamID":"CHI","rating":84,"potential":84},
+  {"forename":"Darius","surname":"Garland","age":26,"position":"PG","teamID":"LAC","rating":84,"potential":88},
+  {"forename":"Desmond","surname":"Bane","age":28,"position":"SG","teamID":"ORL","rating":84,"potential":86},
+  {"forename":"Kon","surname":"Knueppel","age":21,"position":"SF","teamID":"CHA","rating":84,"potential":93},
+  {"forename":"Ivica","surname":"Zubac","age":29,"position":"C","teamID":"IND","rating":84,"potential":85},
+  {"forename":"Mikal","surname":"Bridges","age":30,"position":"SF","teamID":"NYK","rating":84,"potential":84},
+  {"forename":"CJ","surname":"McCollum","age":35,"position":"SG","teamID":"ATL","rating":83,"potential":83},
+  {"forename":"Derrick","surname":"White","age":32,"position":"SG","teamID":"BOS","rating":83,"potential":83},
+  {"forename":"Julius","surname":"Randle","age":32,"position":"PF","teamID":"BKN","rating":83,"potential":83},
+  {"forename":"Paul","surname":"George","age":36,"position":"SF","teamID":"BOS","rating":82,"potential":82},
+  {"forename":"Josh","surname":"Hart","age":31,"position":"SG","teamID":"NYK","rating":82,"potential":82},
+  {"forename":"Naz","surname":"Reid","age":27,"position":"C","teamID":"CHA","rating":82,"potential":85},
+  {"forename":"Jrue","surname":"Holiday","age":36,"position":"PG","teamID":"POR","rating":82,"potential":82},
+  {"forename":"Isaiah","surname":"Hartenstein","age":28,"position":"C","teamID":"OKC","rating":82,"potential":83},
+  {"forename":"Dillon","surname":"Brooks","age":30,"position":"SF","teamID":"PHX","rating":82,"potential":82},
+  {"forename":"Payton","surname":"Pritchard","age":29,"position":"PG","teamID":"BOS","rating":82,"potential":83},
+  {"forename":"Zach","surname":"LaVine","age":31,"position":"SG","teamID":"SAC","rating":82,"potential":82},
+  {"forename":"Dejounte","surname":"Murray","age":30,"position":"PG","teamID":"NOP","rating":82,"potential":82},
+  {"forename":"Donovan","surname":"Clingan","age":22,"position":"C","teamID":"POR","rating":82,"potential":90},
+  {"forename":"Immanuel","surname":"Quickley","age":27,"position":"PG","teamID":"TOR","rating":82,"potential":85},
+  {"forename":"Cason","surname":"Wallace","age":23,"position":"SG","teamID":"OKC","rating":81,"potential":88},
+  {"forename":"Dyson","surname":"Daniels","age":23,"position":"SG","teamID":"ATL","rating":81,"potential":88},
+  {"forename":"Walker","surname":"Kessler","age":25,"position":"C","teamID":"LAL","rating":81,"potential":88},
+  {"forename":"Jonathan","surname":"Kuminga","age":24,"position":"PF","teamID":"MIN","rating":80,"potential":88},
+  {"forename":"Rui","surname":"Hachimura","age":28,"position":"PF","teamID":"LAC","rating":78,"potential":80},
+  {"forename":"Klay","surname":"Thompson","age":36,"position":"SG","teamID":"MIA","rating":78,"potential":78},
+  {"forename":"Bobby","surname":"Portis","age":31,"position":"PF","teamID":"MIA","rating":78,"potential":78},
+  {"forename":"Andrew","surname":"Wiggins","age":31,"position":"SF","teamID":"MIA","rating":80,"potential":80},
+  {"forename":"Ty","surname":"Jerome","age":30,"position":"PG","teamID":"MEM","rating":80,"potential":80},
+  {"forename":"Cameron","surname":"Boozer","age":19,"position":"PF","teamID":"MEM","rating":79,"potential":96},
+  {"forename":"Zach","surname":"Edey","age":24,"position":"C","teamID":"MEM","rating":78,"potential":85},
+  {"forename":"Jerami","surname":"Grant","age":32,"position":"PF","teamID":"MEM","rating":78,"potential":78},
+  {"forename":"Dennis","surname":"Schroder","age":33,"position":"PG","teamID":"CHA","rating":78,"potential":78},
+  {"forename":"Myles","surname":"Turner","age":30,"position":"C","teamID":"MIL","rating":80,"potential":81},
+  {"forename":"Kyle","surname":"Kuzma","age":31,"position":"PF","teamID":"MIL","rating":78,"potential":78},
+  {"forename":"Keon","surname":"Ellis","age":26,"position":"SG","teamID":"BKN","rating":76,"potential":82},
+  {"forename":"Egor","surname":"Demin","age":21,"position":"PG","teamID":"BKN","rating":76,"potential":90},
+  {"forename":"Yaxel","surname":"Lendeborg","age":23,"position":"PF","teamID":"GSW","rating":83,"potential":90},
+  {"forename":"Darius","surname":"Acuff Jr.","age":20,"position":"PG","teamID":"SAC","rating":83,"potential":91}
+];
+
+var TEAM_ID_MAP = {
+  "OKC":"Oklahoma City Thunder","SAS":"San Antonio Spurs","DEN":"Denver Nuggets","LAL":"Los Angeles Lakers",
+  "NYK":"New York Knicks","MIA":"Miami Heat","MIN":"Minnesota Timberwolves","DET":"Detroit Pistons",
+  "GSW":"Golden State Warriors","HOU":"Houston Rockets","TOR":"Toronto Raptors","BOS":"Boston Celtics",
+  "CLE":"Cleveland Cavaliers","PHI":"Philadelphia 76ers","PHX":"Phoenix Suns","IND":"Indiana Pacers",
+  "WAS":"Washington Wizards","DAL":"Dallas Mavericks","UTA":"Utah Jazz","ORL":"Orlando Magic",
+  "ATL":"Atlanta Hawks","POR":"Portland Trail Blazers","NOP":"New Orleans Pelicans","BKN":"Brooklyn Nets",
+  "SAC":"Sacramento Kings","CHA":"Charlotte Hornets","CHI":"Chicago Bulls","LAC":"LA Clippers",
+  "MIL":"Milwaukee Bucks","MEM":"Memphis Grizzlies"
+};
+
+var FN=["Jalen","Marcus","Devin","Tyrone","Caleb","Isaiah","Mason","Elijah","Trevor","Brandon","Darius","Cole","Landon","Xavier","Jordan","Terrell","Micah","Andre","Colton","Rashad","Gavin","Dante","Tyler","Kendrick"];
+var LN=["Johnson","Williams","Carter","Brooks","Hayes","Mitchell","Jefferson","Coleman","Reed","Bennett","Foster","Powell","Sanders","Ward","Price","Hughes","Barnes","Fields","Thompson","Gaines","Dixon","Pierce","Holloway","Whitaker","Boyd","Ramsey","Lawson","Monroe"];
+var CI=["Atlanta","Boston","Brooklyn","Charlotte","Chicago","Cleveland","Dallas","Denver","Detroit","Golden State","Houston","Indiana","LA","Los Angeles","Memphis","Miami","Milwaukee","Minnesota","New Orleans","New York","Oklahoma City","Orlando","Philadelphia","Phoenix","Portland","Sacramento","San Antonio","Toronto","Utah","Washington"];
+var NK=["Hawks","Celtics","Nets","Hornets","Bulls","Cavaliers","Mavericks","Nuggets","Pistons","Warriors","Rockets","Pacers","Clippers","Lakers","Grizzlies","Heat","Bucks","Timberwolves","Pelicans","Knicks","Thunder","Magic","76ers","Suns","Trail Blazers","Kings","Spurs","Raptors","Jazz","Wizards"];
+var POS=[["PG",3],["SG",3],["SF",3],["PF",3],["C",3]],PI={};POS.forEach(function(g,i){PI[g[0]]=i});
+var U={PG:[1,.5,.2],SG:[1,.6,.2],SF:[1,.6,.2],PF:[1,.6,.2],C:[1,.5,.2]};
+var SW={PG:[3.5,1.5,.8],SG:[3,1.5,.8],SF:[3,1.5,.8],PF:[3,1.5,.8],C:[3,1.5,.8]},SWS=0;
+for(var k in SW)SW[k].forEach(function(w){SWS+=w});
+var PV={PG:5,SG:4,SF:4,PF:4,C:5};
+var ST=[["ppg","Points","PPG"],["rpg","Rebounds","RPG"],["apg","Assists","APG"],["spg","Steals","SPG"],["bpg","Blocks","BPG"],["fgp","FG%","FG%"],["tpp","3P%","3P%"]];
+var TABS=[["teams","Teams"],["lead","Leaders"],["top","Top 100"],["pls","Players"],["new","Create player"],["hof","Hall of Fame"],["log","Season log"]];
+var HOFT=180,S,tab="teams",sc="s",st="ppg",cf="all",ed=null,sel=null,pl=null,q="";
+function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function fmt(v){return(+v).toLocaleString()}
+function T(i){return CI[i]+" "+NK[i]}function Tn(i){return i>=0?NK[i]:"Retired"}
+function hf(p){return Math.round(p.av+p.t10*5+p.mvp*12+p.rg*3)}
+function fp(id){var a=S.p.concat(S.ret);for(var i=0;i<a.length;i++)if(a[i].id===id)return a[i]}
+function sline(s){return ST.filter(function(x){return s[x[0]]!==undefined}).map(function(x){return s[x[0]].toFixed(1)+" "+x[2]}).join(", ")}
+function mk(pos,d,t,rk,legendName,legendOvr,legendPot,legendAge){var age=legendAge||(rk?rnd(19,23):rnd(19,36));
+ var o=legendOvr?clamp(legendOvr+rnd(-1,1),50,99):(rk?50+rnd(0,20):clamp(Math.round(76-d*3.2+rnd(-8,8)+(age<23?-3:0)),40,94));
+ var name=legendName||(FN[rnd(0,FN.length-1)]+" "+LN[rnd(0,LN.length-1)]);
+ var pot=legendPot||clamp(o+(rk?rnd(3,18):age<25?rnd(0,12):0),o,99);
+ return{id:S.nid++,n:name,pos:pos,age:age,ovr:o,pot:pot,t:t,s:{},c:{},L:[],av:0,t10:0,mvp:0,rg:0}}
+
+function fresh(){
+ S={season:2026,nid:1,p:[],ret:[],hof:[],tm:[],top:[],log:[],champ:"",rec:{},played:0,prev:{}};
+ for(var t=0;t<30;t++) S.tm.push({w:0,l:0,c:0});
+ ROSTER_2026.forEach(function(lp){
+   var fullTeamName = TEAM_ID_MAP[lp.teamID] || "Oklahoma City Thunder";
+   var teamIndex = 0;
+   for(var i=0; i<CI.length; i++){
+     if((CI[i]+" "+NK[i]) === fullTeamName || NK[i] === fullTeamName.split(" ").pop()){ teamIndex = i; break; }
+   }
+   var p = mk(lp.position, 0, teamIndex, false, lp.forename+" "+lp.surname, lp.rating, lp.potential, lp.age);
+   S.p.push(p);
+ });
+ for(var t=0; t<30; t++){
+   var curCnt={};
+   S.p.filter(function(p){return p.t===t}).forEach(function(p){curCnt[p.pos]=(curCnt[p.pos]||0)+1});
+   POS.forEach(function(g){
+     var need = g[1]-(curCnt[g[0]]||0);
+     for(var i=0; i<need; i++) S.p.push(mk(g[0], i, t));
+   });
+ }
+}
+
+function load(){try{var r=localStorage.getItem("hdyn_2026_longevity");if(r){S=JSON.parse(r);if(S&&S.p)return}}catch(e){}fresh()}
+function save(){try{localStorage.setItem("hdyn_2026_longevity",JSON.stringify(S))}catch(e){}}
+
+function gstat(p,u){var f=p.ovr/80,g=f*f,s={};function z(x){return Math.round(x*u*(.8+Math.random()*.4)*10)/10}
+ switch(p.pos){
+  case"PG":s.ppg=z(22*g);s.rpg=z(4*f);s.apg=z(8*g);s.spg=z(1.3*f);s.bpg=z(.3*f);s.fgp=Math.round((.42+.06*f)*1000)/10;s.tpp=Math.round((.33+.07*f)*1000)/10;break;
+  case"SG":s.ppg=z(20*g);s.rpg=z(4*f);s.apg=z(3.5*f);s.spg=z(1.2*f);s.bpg=z(.4*f);s.fgp=Math.round((.43+.06*f)*1000)/10;s.tpp=Math.round((.35+.06*f)*1000)/10;break;
+  case"SF":s.ppg=z(18*g);s.rpg=z(5.5*f);s.apg=z(3.5*f);s.spg=z(1*f);s.bpg=z(.5*f);s.fgp=Math.round((.45+.05*f)*1000)/10;s.tpp=Math.round((.33+.05*f)*1000)/10;break;
+  case"PF":s.ppg=z(16*g);s.rpg=z(7.5*f);s.apg=z(2.5*f);s.spg=z(.8*f);s.bpg=z(.9*f);s.fgp=Math.round((.47+.05*f)*1000)/10;s.tpp=Math.round((.30+.05*f)*1000)/10;break;
+  case"C":s.ppg=z(15*g);s.rpg=z(10*f);s.apg=z(2.5*f);s.spg=z(.7*f);s.bpg=z(1.5*f);s.fgp=Math.round((.52+.05*f)*1000)/10;s.tpp=Math.round((.25+.05*f)*1000)/10}
+ return s}
+function avf(p,s,u){return Math.max(0,s.ppg*.7+s.rpg*.5+s.apg*.6+s.spg*3+s.bpg*3+(s.fgp-.42)*60)}
+function win(a,b,str){return Math.random()<1/(1+Math.exp((str[b]-str[a])/3))}
+
+function play(){
+ var N=30,by=[],str=[],i,g,k,pos,yr=S.season;
+ for(i=0;i<N;i++){by.push({});S.tm[i]={w:0,l:0,c:0}}
+ S.p.forEach(function(p){(by[p.t][p.pos]=by[p.t][p.pos]||[]).push(p)});
+ for(i=0;i<N;i++){var tot=0;for(pos in by[i])by[i][pos].sort(function(a,b){return b.ovr-a.ovr});
+  for(pos in SW)SW[pos].forEach(function(w,j){var x=by[i][pos]&&by[i][pos][j];tot+=w*(x?x.ovr:40)});str[i]=tot/SWS}
+ for(g=0;g<82;g++){var o=[];for(i=0;i<N;i++)o.push(i);o.sort(function(){return Math.random()-.5});
+  for(k=0;k<N;k+=2){var a=o[k],b=o[k+1],aw=win(a,b,str);S.tm[aw?a:b].w++;S.tm[aw?b:a].l++}}
+ var sd=[],rk={};for(i=0;i<N;i++)sd.push(i);sd.sort(function(a,b){return S.tm[b].w-S.tm[a].w||str[b]-str[a]});
+ sd.forEach(function(t,j){rk[t]=j;S.tm[t].po=j<16});
+ var f=sd.slice(0,16);while(f.length>1){var nx=[],n=f.length;for(k=0;k<n/2;k++){var a=f[k],b=f[n-1-k];nx.push(win(a,b,str)?a:b)}f=nx.sort(function(a,b){return rk[a]-rk[b]})}
+ var ch=f[0];S.tm[ch].c=1;
+ var all=[];
+ for(i=0;i<N;i++)for(pos in by[i])by[i][pos].forEach(function(p,d){var u=(U[p.pos]||[])[d]||0,s=gstat(p,u),a=avf(p,s,u);p.s=s;for(var key in s)p.c[key]=(p.c[key]||0)+s[key];p.av+=a;if(p.t===ch)p.rg++;p.L.push({y:yr,t:p.t,o:p.ovr,s:s,a:Math.round(a)});p.sc=p.ovr+(PV[p.pos]||0)+Math.min(8,a/3);all.push(p)});
+ all.sort(function(a,b){return b.sc-a.sc});
+ var np={};all.slice(0,100).forEach(function(p,j){np[p.id]=j+1;if(j<10)p.t10++;if(j===0)p.mvp++});
+ S.top=all.slice(0,100).map(function(p){return{id:p.id,n:p.n,pos:p.pos,t:p.t,age:p.age,o:p.ovr,sc:Math.round(p.sc*10)/10,pv:S.prev[p.id]||0}});S.prev=np;
+ ST.forEach(function(x){var kk=x[0],c=S.p.filter(function(p){return p.s[kk]!==undefined}).sort(function(a,b){return b.s[kk]-a.s[kk]}).slice(0,10).map(function(p){return{n:p.n,pos:p.pos,t:p.t,y:yr,v:p.s[kk]}});S.rec[kk]=(S.rec[kk]||[]).concat(c).sort(function(a,b){return b.v-a.v}).slice(0,10)});
+ var lines=[],hofs=[],nret=0,keep=[],best=all[0];
+
+ S.p.forEach(function(p){
+  var a=p.age, d=0;
+  if(a<=24){d=rnd(0,1+Math.ceil((p.pot-p.ovr)/4))}
+  else if(a<=29){d=Math.random()<0.15?-1:0}
+  else if(a<=33){d=Math.random()<0.45?-1:0}
+  else{d=-rnd(0,2)}
+  p.ovr=clamp(p.ovr+d,35,d>0?Math.max(p.pot,p.ovr):99);
+  p.age=a+1;a=p.age;
+  var c=a>=44?1:a===43?0.75:a===42?0.55:a===41?0.40:a===40?0.25:a===39?0.15:a===38?0.08:0;
+  if(Math.random()<c){
+    nret++;p.ry=yr;p.lt=p.t;p.t=-1;
+    var ind=hf(p)>=HOFT&&!p.inh;
+    if(ind){p.inh=1;S.hof.push(p);hofs.push(esc(p.n))}
+    S.ret.push(p);
+    if((p.ovr>=72||ind)&&lines.length<25){lines.push(esc(p.n)+" ("+p.pos+", "+NK[p.lt]+") retired at "+a+(ind?' <span class="up">and was inducted into the Hall of Fame</span>':"")+".")}
+  } else {keep.push(p)}
+ });
+ S.p=keep;
+
+ var cnt={},nr=0;S.p.forEach(function(p){cnt[p.t+p.pos]=(cnt[p.t+p.pos]||0)+1});
+ for(i=0;i<N;i++)POS.forEach(function(g){for(var j=cnt[i+g[0]]||0;j<g[1];j++){S.p.push(mk(g[0],j,i,1));nr++}});
+ S.log.unshift({y:yr,ch:T(ch),rec:S.tm[ch].w+"-"+S.tm[ch].l,mvp:best.n+" ("+best.pos+","+NK[best.t]+")",lines:lines,hofs:hofs,nret:nret,nr:nr});
+ S.champ=NK[ch];S.played=yr;S.season++;save();render()}
+
+function tbl(h,r){return'<div class="scroll"><table><tr>'+h.map(function(x){return'<th>'+x+'</th>'}).join('')+'</tr>'+r.map(function(x){return'<tr>'+x.map(function(c){return'<td>'+c+'</td>'}).join('')+'</tr>'}).join('')+'</table></div>'}
+function btn(a,v,t){return'<button class="lnk" data-a="'+a+'" data-v="'+v+'">'+t+'</button>'}
+function pbtn(p){return btn('pl',p.id,esc(p.n))}
+function chips(list,cur,a){return'<div style="margin-bottom:12px;display:flex;gap:6px;flex-wrap:wrap">'+list.map(function(x){return'<button class="btn'+(cur===x[0]?'':' alt')+'" data-a="'+a+'" data-v="'+x[0]+'">'+x[1]+'</button>'}).join('')+'</div>'}
+
+function teamsV(){
+ if(sel===null){var o=S.tm.map(function(x,i){return i}).sort(function(a,b){return S.tm[b].w-S.tm[a].w});
+  return(S.played?'<p class="mu">Season '+S.played+' standings. Click a team to inspect its 15-man roster.</p>':'<p class="mu">2026 offseason 15-man rosters active. Click a team to inspect players.</p>')+
+  tbl(['Team','W','L','Result'],o.map(function(i){var x=S.tm[i];return[btn('team',i,T(i)),x.w,x.l,x.c?'<b>Champion</b>':x.po?'Playoffs':'']}))}
+ var ros=S.p.filter(function(p){return p.t===sel}).sort(function(a,b){return (PI[a.pos]||0)-(PI[b.pos]||0)||b.ovr-a.ovr});
+ return'<p>'+btn('back','','← All teams')+'</p><h3>'+T(sel)+' ('+ros.length+' players)</h3>'+tbl(['Pos','Name','Age','Rating','Potential','Last season'],ros.map(function(p){return[p.pos,pbtn(p),p.age,p.ovr,p.pot,sline(p.s)]}))}
+
+function leadV(){
+ var h=chips([["s","This season"],["c","Career (all-time)"],["r","Single-season records"]],sc,"sc")+(sc==="c"?chips([["all","All players"],["act","Active only"],["ret","Retired only"]],cf,"cf"):"")+chips(ST.map(function(x){return[x[0],x[1]]}),st,"st"),lab=ST.filter(function(x){return x[0]===st})[0][1],hd,rows;
+ if(sc==="r"){hd=["#","Player","Pos","Year","Team",lab];rows=(S.rec[st]||[]).map(function(r,i){return[i+1,esc(r.n),r.pos,"Season "+r.y,Tn(r.t),r.v.toFixed(1)]})}
+ else if(sc==="s"){hd=["#","Player","Pos","Team","Age",lab];rows=S.p.filter(function(p){return p.s[st]!==undefined}).sort(function(a,b){return b.s[st]-a.s[st]}).slice(0,15).map(function(p,i){return[i+1,pbtn(p),p.pos,Tn(p.t),p.age,p.s[st].toFixed(1)]})}
+ else{hd=["#","Player","Pos","Status","Age",lab+" (career)"];rows=(cf==="act"?S.p:cf==="ret"?S.ret:S.p.concat(S.ret)).filter(function(p){return p.c[st]!==undefined}).sort(function(a,b){return b.c[st]-a.c[st]}).slice(0,15).map(function(p,i){return[i+1,pbtn(p),p.pos,p.t>=0?Tn(p.t):p.inh?"Hall of Fame":"Retired",p.age,p.c[st].toFixed(1)]})}
+ return h+(rows.length?tbl(hd,rows):'<div class="empty">Play a season to see stats.</div>')}
+
+function topV(){if(!S.top.length)return'<div class="empty">Play a season to see the top 100 players.</div>';
+ return'<p class="mu">Rank is unified rating plus position value plus simulation performance.</p>'+tbl(["#","Player","Pos","Team","Age","Rating","Score","Move"],S.top.map(function(p,i){var m=S.played<2?"—":p.pv?(p.pv>i+1?'<span class="up">▲'+(p.pv-i-1)+'</span>':p.pv<i+1?'<span class="dn">▼'+(i+1-p.pv)+'</span>':"—"):"New";return[i+1,btn("pl",p.id,esc(p.n)),p.pos,Tn(p.t),p.age,p.o,p.sc,m]}))}
+
+function res(){var s=q.toLowerCase().trim(),l=S.p.concat(S.ret).filter(function(p){return!s||(p.n+" "+p.pos+" "+(p.t>=0?T(p.t):"retired")).toLowerCase().indexOf(s)>=0}).sort(function(a,b){return b.ovr-a.ovr}).slice(0,30);
+ return tbl(["Name","Pos","Team","Age","Rating","Career AV"],l.map(function(p){return[pbtn(p),p.pos,p.t>=0?Tn(p.t):"Retired",p.age,p.ovr,Math.round(p.av)]}))}
+function plsV(){return'<input id="q" placeholder="Search by name, position or team" value="'+esc(q)+'" style="width:100%;margin-bottom:12px"><div id="res">'+res()+'</div>'}
+
+function plV(){var p=fp(pl);if(!p)return"";
+ return'<p>'+btn("back","","← Back")+' '+btn("edit",p.id,"Edit player")+'</p><h3>'+esc(p.n)+", "+p.pos+'</h3><p class="mu">'+(p.t>=0?T(p.t):p.inh?"Retired, Hall of Fame":"Retired")+", age "+p.age+", rating "+p.ovr+", Hall of Fame points "+hf(p)+'</p><p><b>Career:</b> '+(sline(p.c)||"No stats yet")+'</p>'+(p.L.length?tbl(["Season","Team","Rating","AV","Stats"],p.L.slice().reverse().map(function(l){return["Season "+l.y,Tn(l.t),l.o,l.a,sline(l.s)]})):'<div class="empty">No seasons played yet.</div>')}
+
+function hofV(){var ap=S.p.concat(S.ret).map(function(p){return[p,hf(p)]}).filter(function(r){return r[1]>0}).sort(function(a,b){return b[1]-a[1]}).slice(0,15);
+ return'<p class="mu">Retired players enter the Hall of Fame with '+HOFT+' points: career approximate value, plus 5 per top-10 season, 12 per #1 season and 3 per championship.</p>'+
+ (S.hof.length?'<h3>Inductees</h3>'+tbl(["Name","Pos","Class","Seasons","Career AV","Top 10s","#1 seasons","Rings","Points"],S.hof.slice().reverse().map(function(p){return[pbtn(p),p.pos,"Season "+p.ry,p.L.length,Math.round(p.av),p.t10,p.mvp,p.rg,hf(p)]})):'<div class="empty">No inductees yet. Players retire starting at age 38.</div>')+
+ '<h3>Hall of Fame points leaders</h3>'+(ap.length?tbl(["#","Player","Pos","Status","Points"],ap.map(function(r,i){var p=r[0];return[i+1,pbtn(p),p.pos,p.t>=0?Tn(p.t):p.inh?"Hall of Fame":"Retired",r[1]]})):'<div class="empty">No points yet.</div>')}
+
+function logV(){return S.log.length?S.log.map(function(e){return'<h3>Season '+e.y+'</h3><p><b>Champion:</b> '+e.ch+' ('+e.rec+'). <b>Best player:</b> '+esc(e.mvp)+'.</p><p class="mu">'+e.nret+' players retired (38+) and '+e.nr+' rookies joined.'+(e.hofs.length?' Hall of Fame class: '+e.hofs.join(", ")+'.':'')+'</p><ul>'+e.lines.map(function(l){return'<li>'+l+'</li>'}).join('')+'</ul>'}).join(''):'<div class="empty">Play a season to start the history book.</div>'}
+
+function formV(p){var n=p?p.n:"",pos=p?p.pos:"SF",age=p?p.age:22,o=p?p.ovr:65,pt=p?p.pot:75,t=p?p.t:0,np=!p;
+ function opt(v,l,s2){return'<option value="'+v+'"'+(s2?' selected':'')+'>'+l+'</option>'}
+ function fld(l,c){return'<label style="display:flex;flex-direction:column;font-size:13px;color:var(--mu);gap:4px">'+l+c+'</label>'}
+ return'<h3>'+(np?'Create player':'Edit '+esc(p.n))+'</h3><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">'+
+ fld('Name','<input id="fn" value="'+esc(n)+'" maxlength="40">')+
+ fld('Position','<select id="fp">'+POS.map(function(g){return opt(g[0],g[0],g[0]===pos)}).join('')+'</select>')+
+ (np||t>=0?fld('Team','<select id="ft">'+CI.map(function(c,i){return opt(i,T(i),i===t)}).join('')+'</select>'):'')+
+ fld('Age','<input id="fa" type="number" min="18" max="45" value="'+age+'">')+
+ fld('Rating','<input id="fo" type="number" min="35" max="99" value="'+o+'">')+
+ fld('Potential','<input id="fq" type="number" min="35" max="99" value="'+pt+'">')+
+ '</div><p style="margin-top:16px"><button class="btn go" data-a="savep">'+(np?'Create and sign player':'Save changes')+'</button>'+(np?'':'<button class="btn alt" data-a="cancel">Cancel</button>')+'</p>'}
+
+function savep(){var g=function(i){return document.getElementById(i)},p=ed==="new"?null:fp(ed),o=clamp(+g("fo").value||60,35,99);
+ if(!p){p=mk(g("fp").value,0,+g("ft").value);S.p.push(p)}
+ p.n=g("fn").value.trim()||"Player";p.pos=g("fp").value;p.age=clamp(+g("fa").value||25,18,45);p.ovr=o;p.pot=clamp(Math.max(+g("fq").value||o,o),o,99);
+ if(p.t>=0&&g("ft"))p.t=+g("ft").value;
+ pl=p.id;ed=null;save();render()}
+
+function render(){
+ document.getElementById("a").textContent=S.season;document.getElementById("b").textContent=fmt(S.p.length);document.getElementById("c").textContent=S.champ||"—";document.getElementById("d").textContent=S.hof.length;
+ document.getElementById("play").textContent="Play season "+S.season;
+ document.getElementById("nav").innerHTML=TABS.map(function(t){return'<button data-t="'+t[0]+'" aria-selected="'+(t[0]===tab&&pl===null)+'">'+t[1]+'</button>'}).join("");
+ document.getElementById("view").innerHTML=pl!==null?(ed===pl?formV(fp(pl)):plV()):({teams:teamsV,lead:leadV,top:topV,pls:plsV,"new":function(){return formV(null)},hof:hofV,log:logV})[tab]()}
+
+document.getElementById("themeToggle").addEventListener("click",function(){
+ var html=document.documentElement;
+ var cur=html.getAttribute("data-theme");
+ var next=cur==="light"?"dark":"light";
+ html.setAttribute("data-theme",next);
+ try{localStorage.setItem("hdyn_2026_theme",next)}catch(e){}
+});
+try{var savedTheme=localStorage.getItem("hdyn_2026_theme");if(savedTheme){document.documentElement.setAttribute("data-theme",savedTheme)}}catch(e){}
+
+document.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var a=b.dataset.a,v=b.dataset.v;
+ if(b.dataset.t){tab=b.dataset.t;pl=null;ed=tab==="new"?"new":null;if(tab==="teams")sel=null;render();return}
+ if(b.id==="reset"){if(b.dataset.armed){fresh();tab="teams";sel=null;pl=null;save();render();b.textContent="Reset league";delete b.dataset.armed}else{b.dataset.armed="1";b.textContent="Click again to erase everything";setTimeout(function(){b.textContent="Reset league";delete b.dataset.armed},4000)}return}
+ if(a==="play")play();else if(a==="team"){sel=+v;render()}else if(a==="back"){if(pl!==null){pl=null;ed=null}else sel=null;render()}
+ else if(a==="pl"){pl=+v;render()}else if(a==="sc"){sc=v;render()}else if(a==="st"){st=v;render()}else if(a==="cf"){cf=v;render()}else if(a==="edit"){pl=+v;ed=+v;render()}else if(a==="cancel"){ed=null;render()}else if(a==="savep")savep()});
+
+document.addEventListener("input",function(e){if(e.target.id==="q"){q=e.target.value;var resEl=document.getElementById("res");if(resEl)resEl.innerHTML=res()}});
+load();render();
+})();
+</script>
+</body>
+</html>
